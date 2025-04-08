@@ -24,6 +24,21 @@
           <input v-model="question.label" class="form-control" placeholder="Enter question" required />
         </div>
   
+        <div v-if="question.type === 'text'" class="form-group">
+          <label>Question Format</label>
+          <select v-model="question.format" class="form-control" required>
+            <option value="multipleChoice">Multiple Choice</option>
+            <option value="trueFalse">True/False</option>
+            <option value="shortAnswer">Short Answer</option>
+            <option value="longAnswer">Long Answer</option>
+          </select>
+        </div>
+  
+        <div v-if="question.format === 'multipleChoice'" class="form-group">
+          <label>Choices (separate with commas)</label>
+          <input v-model="question.choices" class="form-control" placeholder="Enter choices" />
+        </div>
+  
         <div v-if="question.type === 'image'" class="form-group">
           <label>Image</label>
           <input type="file" @change="onImageUpload" class="form-control-file" />
@@ -44,17 +59,26 @@
   </template>
   
   <script>
+  import { createClient } from '@supabase/supabase-js'
+  import { v4 as uuidv4 } from 'uuid'
+  
+  const supabaseUrl = process.env.VUE_APP_SUPABASE_URL
+  const supabaseKey = process.env.VUE_APP_SUPABASE_KEY
+  const supabase = createClient(supabaseUrl, supabaseKey)
+  
   export default {
     data() {
       return {
         isEditing: false,
         question: {
+          id: null,
           label: '',
           type: 'text',
+          format: 'multipleChoice',
           image: '',
-          testType: 'pattern' // default to a test type
+          choices: '',
+          testType: 'pattern'
         },
-        questionIndex: null, // Will store index of the question being edited
         tests: [
           { name: 'Test 1: Image Pattern Analysis', id: 'pattern' },
           { name: 'Test 2: Basic Math', id: 'math' },
@@ -65,60 +89,91 @@
         ]
       }
     },
-    mounted() {
-      const questionIndex = this.$route.params.index
-      if (questionIndex !== undefined) {
-        this.isEditing = true
-        this.questionIndex = questionIndex
-        const savedQuestions = JSON.parse(localStorage.getItem('questions') || '{}')
-        for (let testType in savedQuestions) {
-          const testQuestions = savedQuestions[testType]
-          const question = testQuestions.find(q => q.id === questionIndex)
-          if (question) {
-            this.question = { ...question }
+    async mounted() {
+      const testType = this.$route.params.testType
+      const index = this.$route.params.index
+  
+      if (testType && index !== undefined) {
+        const { data, error } = await supabase
+          .from('questions')
+          .select('*')
+          .eq('test_type', testType)
+  
+        if (!error && data && data[index]) {
+          this.isEditing = true
+          this.question = {
+            id: data[index].id,
+            label: data[index].label,
+            type: data[index].type,
+            format: data[index].format,
+            image: data[index].image_url,
+            choices: data[index].choices,
+            testType: data[index].test_type
           }
         }
       }
     },
     methods: {
-      onImageUpload(e) {
+      async onImageUpload(e) {
         const file = e.target.files[0]
-        if (file) {
-          const reader = new FileReader()
-          reader.onload = e => {
-            this.question.image = e.target.result
-          }
-          reader.readAsDataURL(file)
+        if (!file) return
+  
+        const fileName = `question-images/${uuidv4()}`
+        const { error } = await supabase.storage.from('images').upload(fileName, file)
+  
+        if (error) {
+          alert('Failed to upload image')
+          return
         }
+  
+        const { data: urlData } = supabase.storage.from('images').getPublicUrl(fileName)
+        this.question.image = urlData.publicURL
       },
-      saveQuestion() {
-        const savedQuestions = JSON.parse(localStorage.getItem('questions') || '{}')
   
-        if (!savedQuestions[this.question.testType]) {
-          savedQuestions[this.question.testType] = []
-        }
+      async saveQuestion() {
+  const { id, label, type, format, choices, image, testType } = this.question;
+
+  let response;
+  if (this.isEditing && id) {
+    response = await supabase
+      .from('questions')
+      .update({ label, type, format, choices, image_url: image || null, test_type: testType })
+      .eq('id', id);
+  } else {
+    response = await supabase
+      .from('questions')
+      .insert([{ label, type, format, choices, image_url: image || null, test_type: testType }]);
+  }
+
+  if (response.error) {
+    console.error('Error:', response.error); // log full error message
+    alert('Error saving question: ' + response.error.message);
+  } else {
+    alert('Question saved!');
+    this.$router.push('/admin');
+  }
+},
   
-        if (this.isEditing) {
-          const updatedQuestions = savedQuestions[this.question.testType].map(q => q.id === this.question.id ? { ...this.question } : q)
-          savedQuestions[this.question.testType] = updatedQuestions
+      async deleteQuestion() {
+        if (!this.question.id) return
+        if (!confirm('Are you sure you want to delete this question?')) return
+  
+        const { error } = await supabase
+          .from('questions')
+          .delete()
+          .eq('id', this.question.id)
+  
+        if (error) {
+          alert('Failed to delete question')
+          console.error(error)
         } else {
-          savedQuestions[this.question.testType].push({ ...this.question, id: Date.now() })
-        }
-  
-        localStorage.setItem('questions', JSON.stringify(savedQuestions))
-        this.$router.push('/admin') // Redirect back to Admin Panel
-      },
-      deleteQuestion() {
-        if (confirm('Are you sure you want to delete this question?')) {
-          const savedQuestions = JSON.parse(localStorage.getItem('questions') || '{}')
-          savedQuestions[this.question.testType] = savedQuestions[this.question.testType].filter(q => q.id !== this.question.id)
-          localStorage.setItem('questions', JSON.stringify(savedQuestions))
-          this.$router.push('/admin') // Redirect back to Admin Panel
+          alert('Question deleted!')
+          this.$router.push('/admin')
         }
       }
     }
   }
-  </script>
+  </script>  
   
   <style scoped>
   button {
