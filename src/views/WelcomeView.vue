@@ -36,12 +36,16 @@ export default {
 
 <style scoped>
 .welcome-page {
-  background-color: #f8f9fa;
+  background-color: #b3c5ff;
   padding: 2rem;
 }
 
 .logo {
   max-width: 240px;
   border-radius: 10px;
+}
+
+.card {
+  background: rgb(248, 241, 165);
 }
 </style>

@@ -89,7 +89,7 @@
     width: 350px;
     border-radius: 10px;
     text-align: center;
-    background: white;
+    background: rgb(248, 241, 165);
   }
   
   /* H2 Title Color Matching Background */

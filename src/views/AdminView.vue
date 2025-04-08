@@ -1,108 +1,99 @@
 <template>
-    <div class="container mt-4">
-      <h2 class="mb-4">Admin Panel — Create Questions</h2>
-  
-      <div class="form-group">
-        <label>Question Type</label>
-        <select v-model="newQuestion.type" class="form-control">
-          <option value="text">Text</option>
-          <option value="image">Image</option>
-        </select>
-      </div>
-  
-      <div class="form-group">
-        <label>Question Label</label>
-        <input v-model="newQuestion.label" class="form-control" placeholder="Enter question" />
-      </div>
-  
-      <div v-if="newQuestion.type === 'image'" class="form-group">
-        <label>Image</label>
-        <input type="file" @change="onImageUpload" class="form-control-file" />
-        <div v-if="newQuestion.image" class="mt-2">
-          <img :src="newQuestion.image" class="img-thumbnail" style="max-width: 200px;" />
-        </div>
-      </div>
-  
-      <button @click="addQuestion" class="btn btn-primary mt-3">Add Question</button>
-  
-      <hr />
-  
-      <h4>Question List</h4>
-      <div v-if="questions.length === 0">No questions added yet.</div>
-      <ul class="list-group">
-        <li v-for="(q, i) in questions" :key="i" class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <strong>{{ q.label }}</strong>
-            <span class="badge badge-info ml-2">{{ q.type }}</span>
-            <div v-if="q.image">
-              <img :src="q.image" style="max-width: 100px;" class="mt-2" />
-            </div>
-          </div>
-          <div>
-            <button @click="archiveQuestion(i)" class="btn btn-sm btn-warning mr-2">Archive</button>
-            <button @click="deleteQuestion(i)" class="btn btn-sm btn-danger">Delete</button>
-          </div>
-        </li>
-      </ul>
+  <div class="container mt-4">
+    <h2 class="mb-4">Admin Panel</h2>
+
+    <div class="action-buttons">
+      <button @click="goToManageQuestions" class="btn btn-primary btn-lg mb-3">
+        Manage Test Questions
+      </button>
+      <button @click="goToViewResults" class="btn btn-success btn-lg mb-3">
+        View Jobseeker Test Results
+      </button>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        newQuestion: {
-          label: '',
-          type: 'text',
-          image: ''
-        },
-        questions: []
-      }
+
+    <div v-if="showManageQuestions" class="manage-questions">
+      <h3>Manage Questions</h3>
+      <button @click="goToCreateQuestion" class="btn btn-outline-primary mb-3">Create New Question</button>
+      <button @click="goToEditQuestions" class="btn btn-outline-secondary mb-3">Edit/Delete Questions</button>
+    </div>
+
+    <div v-if="showViewResults" class="view-results">
+      <h3>Jobseeker Results</h3>
+      <button @click="downloadResults" class="btn btn-outline-success mb-3">
+        Download Test Results (CSV)
+      </button>
+      <div v-if="jobseekerResults.length > 0">
+        <ul class="list-group">
+          <li v-for="(result, index) in jobseekerResults" :key="index" class="list-group-item">
+            <strong>Test ID: {{ result.timestamp }}</strong>
+            <ul>
+              <li v-for="(answer, idx) in result.answers" :key="idx">Question {{ idx + 1 }}: {{ answer }}</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div v-else>
+        <p>No results submitted yet.</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      showManageQuestions: false,
+      showViewResults: false,
+      jobseekerResults: []
+    }
+  },
+  mounted() {
+    // Fetch jobseeker results from localStorage (or API if available)
+    const results = localStorage.getItem('responses')
+    if (results) {
+      this.jobseekerResults = JSON.parse(results)
+    }
+  },
+  methods: {
+    goToManageQuestions() {
+      this.showManageQuestions = true
+      this.showViewResults = false
     },
-    mounted() {
-      const saved = localStorage.getItem('questions')
-      if (saved) {
-        this.questions = JSON.parse(saved)
-      }
+    goToViewResults() {
+      this.showManageQuestions = false
+      this.showViewResults = true
     },
-    methods: {
-      onImageUpload(e) {
-        const file = e.target.files[0]
-        if (file) {
-          const reader = new FileReader()
-          reader.onload = e => {
-            this.newQuestion.image = e.target.result
-          }
-          reader.readAsDataURL(file)
-        }
-      },
-      addQuestion() {
-        if (!this.newQuestion.label) return alert('Please enter a question label.')
-        this.questions.push({ ...this.newQuestion })
-        this.save()
-        this.reset()
-      },
-      deleteQuestion(index) {
-        if (confirm('Delete this question?')) {
-          this.questions.splice(index, 1)
-          this.save()
-        }
-      },
-      archiveQuestion(index) {
-        const archived = JSON.parse(localStorage.getItem('archived_questions') || '[]')
-        archived.push(this.questions[index])
-        localStorage.setItem('archived_questions', JSON.stringify(archived))
-  
-        this.questions.splice(index, 1)
-        this.save()
-      },
-      save() {
-        localStorage.setItem('questions', JSON.stringify(this.questions))
-      },
-      reset() {
-        this.newQuestion = { label: '', type: 'text', image: '' }
-      }
+    goToCreateQuestion() {
+      this.$router.push('/admin/create-question') // Route for creating questions
+    },
+    goToEditQuestions() {
+      this.$router.push('/admin/edit-questions') // Route for editing/deleting questions
+    },
+    downloadResults() {
+      const results = JSON.parse(localStorage.getItem('responses') || '[]')
+      let csv = 'Test ID, Answers\n'
+      results.forEach(result => {
+        csv += `${result.timestamp}, ${result.answers.join('; ')}\n`
+      })
+      const blob = new Blob([csv], { type: 'text/csv' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'jobseeker_results.csv'
+      link.click()
     }
   }
-  </script>
-  
+}
+</script>
+
+<style scoped>
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+.manage-questions, .view-results {
+  display: flex;
+  flex-direction: column;
+}
+</style>
