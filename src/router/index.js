@@ -4,6 +4,7 @@ import Router from 'vue-router'
 // Views
 import WelcomeView from '../views/WelcomeView.vue'
 import LoginView from '../views/LoginView.vue'
+import JobseekerCVForm from '../views/JobseekerCVForm.vue'
 import TestNavigationView from '../views/TestNavigationView.vue'
 import AdminView from '../views/AdminView.vue'
 import CreateEditQuestionView from '../views/CreateEditQuestionView.vue'
@@ -18,7 +19,8 @@ export default new Router({
     { path: '/', name: 'welcome', component: WelcomeView },
     { path: '/login', name: 'login', component: LoginView },
 
-    // Jobseeker Test Navigation
+    // Jobseeker Routes
+    { path: '/jobseeker/cv', name: 'jobseeker-cv', component: JobseekerCVForm },
     { path: '/test-selection', name: 'test-selection', component: TestNavigationView },
 
     // Admin Routes
@@ -26,7 +28,7 @@ export default new Router({
     { path: '/admin/manage-questions', name: 'manage-questions', component: AdminPanel },  // Admin can manage questions
     { path: '/admin/create-question', name: 'create-question', component: CreateEditQuestionView },  // Admin can create new questions
     { path: '/admin/edit-questions', name: 'edit-questions', component: AdminPanel },  // Admin can edit/delete questions
-    
+
     // Edit a specific question for admin
     {
       path: '/admin/edit-question/:testType/:index',

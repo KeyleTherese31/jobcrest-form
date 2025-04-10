@@ -28,7 +28,7 @@ export default {
       this.$router.push('/login') // future login page
     },
     goToJobseeker() {
-      this.$router.push('/test-selection') // future test navigation
+      this.$router.push('/jobseeker/cv') // cv
     }
   }
 }
