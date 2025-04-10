@@ -1,6 +1,8 @@
 <template>
+ <div class="jobseeker-cv-page">
   <div class="jobseeker-cv-form container py-4">
-    <h2 class="text-center mb-4">Jobseeker CV Form</h2>
+    <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo" />
+    <h2 class="text-center mb-4">Curricilum Vitae Form</h2>
     <form @submit.prevent="submitForm">
       <!-- Position and Admin Only Section -->
       <div class="form-group">
@@ -108,6 +110,7 @@
       <button class="btn btn-primary mt-3" type="submit">Submit</button>
     </form>
   </div>
+ </div>
 </template>
 
 <script>
@@ -174,8 +177,12 @@ export default {
 </script>
 
 <style scoped>
+.jobseeker-cv-page {
+  background: #034c8b;
+}
 .jobseeker-cv-form {
   max-width: 800px;
   margin: 0 auto;
+  background: #c0def8;
 }
 </style>

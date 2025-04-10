@@ -48,3 +48,10 @@
   }
   </script>
   
+  <style>
+  .logo {
+  max-width: 240px;
+  border-radius: 10px;
+}
+
+  </style>

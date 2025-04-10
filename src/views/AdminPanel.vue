@@ -1,5 +1,6 @@
 <template>
   <div class="container mt-4">
+    <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo" />
     <h2 class="mb-4 text-center">Admin Panel</h2>
 
     <!-- Dropdown to Choose Test Category -->
@@ -130,6 +131,11 @@ export default {
   display: flex;
   flex-direction: row;
   gap: 5px;
+}
+
+.logo {
+  max-width: 240px;
+  border-radius: 10px;
 }
 
 img {

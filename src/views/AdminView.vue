@@ -1,5 +1,6 @@
 <template>
   <div class="container mt-4">
+    <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo" />
     <h2 class="mb-4">Admin Panel</h2>
 
     <div class="action-buttons">
@@ -91,6 +92,10 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 30px;
+}
+.logo {
+  max-width: 240px;
+  border-radius: 10px;
 }
 .manage-questions, .view-results {
   display: flex;
