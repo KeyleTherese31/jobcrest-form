@@ -1,203 +1,111 @@
 <template>
-  <div class="container mt-4">
-    <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo mb-3" />
-    <h2 class="mb-4">Curriculum Vitae Form</h2>
-    <br>
-    <form @submit.prevent="submitCV">
-      <!-- I. PERSONAL IDENTITY -->
-      <div v-if="currentSection === 1">
-        <h4>I. Personal Identity</h4>
-        <!-- Personal Identity Fields -->
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label>Last Name</label>
-            <input v-model="cv.lastName" class="form-control" required />
-          </div>
-          <div class="form-group col-md-4">
-            <label>First Name</label>
-            <input v-model="cv.firstName" class="form-control" required />
-          </div>
-          <div class="form-group col-md-4">
-            <label>Middle Name</label>
-            <input v-model="cv.middleName" class="form-control" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Address</label>
-          <textarea v-model="cv.address" class="form-control" required></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>Contact No.</label>
-            <input v-model="cv.contact" class="form-control" />
-          </div>
-          <div class="form-group col-md-6">
-            <label>Date of Birth</label>
-            <input type="date" v-model="cv.dob" class="form-control" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Place of Birth</label>
-          <input v-model="cv.pob" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" v-model="cv.email" class="form-control" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label>National ID No.</label>
-            <input v-model="cv.nationalId" class="form-control" />
-          </div>
-          <div class="form-group col-md-4">
-            <label>SSS No.</label>
-            <input v-model="cv.sssNo" class="form-control" required />
-          </div>
-          <div class="form-group col-md-4">
-            <label>TIN No.</label>
-            <input :disabled="cv.isNewTIN" v-model="cv.tinNo" class="form-control" />
-            <div class="form-check mt-1">
-              <input type="checkbox" v-model="cv.isNewTIN" class="form-check-input" id="newTIN" />
-              <label class="form-check-label" for="newTIN">NEW</label>
-            </div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>Pag-Ibig No.</label>
-            <input v-model="cv.pagibigNo" class="form-control" />
-          </div>
-          <div class="form-group col-md-6">
-            <label>PhilHealth No.</label>
-            <input v-model="cv.philhealthNo" class="form-control" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Civil Status & Dependents</label>
-          <input v-model="cv.civilStatus" class="form-control" />
-        </div>
-        
-        <!-- Signature Upload -->
-        <div class="form-group">
-          <label>Upload Signature (Optional)</label>
-          <input type="file" @change="onFileUpload" class="form-control-file" />
-          <div v-if="cv.signatureUrl" class="mt-2">
-            <img :src="cv.signatureUrl" class="img-thumbnail" style="max-width: 200px;" />
-          </div>
-        </div>
-
-        <button type="button" @click="nextSection" class="btn btn-primary">Next</button>
+  <div class="jobseeker-cv-form container py-4">
+    <h2 class="text-center mb-4">Jobseeker CV Form</h2>
+    <form @submit.prevent="submitForm">
+      <!-- Position and Admin Only Section -->
+      <div class="form-group">
+        <label>Position Applied for:</label>
+        <input type="text" v-model="form.position" class="form-control" required />
       </div>
+      <div class="form-group">
+        <label>Date Applied:</label>
+        <input type="date" v-model="form.date_applied" class="form-control" readonly />
+      </div>
+
+      <!-- I. PERSONAL IDENTITY -->
+      <fieldset class="mt-4">
+        <legend>I. PERSONAL IDENTITY</legend>
+        <div class="form-row">
+          <div class="col"><input class="form-control" v-model="form.last_name" placeholder="Last Name" required /></div>
+          <div class="col"><input class="form-control" v-model="form.first_name" placeholder="First Name" required /></div>
+          <div class="col"><input class="form-control" v-model="form.middle_name" placeholder="Middle Name" /></div>
+        </div>
+
+        <input class="form-control mt-2" v-model="form.address" placeholder="Full Address" />
+        <input class="form-control mt-2" v-model="form.contact_no" placeholder="Contact No." />
+        <label class="mt-2">Date of Birth:</label>
+        <input type="date" v-model="form.dob" class="form-control" />
+        <input class="form-control mt-2" v-model="form.pob" placeholder="Place of Birth" />
+        <input class="form-control mt-2" v-model="form.email" type="email" placeholder="Email Address" />
+        <input class="form-control mt-2" v-model="form.national_id" placeholder="National ID No." />
+        <input class="form-control mt-2" v-model="form.sss_no" placeholder="SSS No." />
+
+        <div class="form-group mt-2">
+          <label>TIN No.:</label>
+          <input class="form-control" v-model="form.tin_no" :disabled="form.tin_new" />
+          <div class="form-check">
+            <input type="checkbox" v-model="form.tin_new" class="form-check-input" id="tinNew" />
+            <label for="tinNew" class="form-check-label">NEW</label>
+          </div>
+        </div>
+
+        <input class="form-control mt-2" v-model="form.pagibig" placeholder="Pag-Ibig (HDMF) No." />
+        <input class="form-control mt-2" v-model="form.philhealth" placeholder="Philhealth No." />
+        <input class="form-control mt-2" v-model="form.civil_status" placeholder="Civil Status and No. of Dependents" />
+      </fieldset>
 
       <!-- II. EDUCATIONAL BACKGROUND -->
-      <div v-if="currentSection === 2">
-        <h4>II. Educational Background</h4>
-        <div class="form-group">
-          <label>College (Degree/Course, School/Location, Year Attended)</label>
-          <input v-model="cv.college" class="form-control" />
+      <fieldset class="mt-4">
+        <legend>II. EDUCATIONAL BACKGROUND</legend>
+        <div v-for="(level, i) in educationLevels" :key="i" class="form-group">
+          <label>{{ level.label }}</label>
+          <input class="form-control mt-1" v-model="form.education[level.key]" placeholder="Degree/Course, School/Location, Year Attended" />
         </div>
-        <div class="form-group">
-          <label>Vocational (Degree/Course, School/Location, Year Attended)</label>
-          <input v-model="cv.vocational" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>High School (Degree/Course, School/Location, Year Attended)</label>
-          <input v-model="cv.highSchool" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Graduate Studies</label>
-          <input v-model="cv.graduateStudies" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Special Course/Skills</label>
-          <input v-model="cv.specialCourse" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Computer Literacy</label>
-          <input v-model="cv.computerLiteracy" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Machine/Station Handled</label>
-          <input v-model="cv.machinaHandled" class="form-control" />
-        </div>
+      </fieldset>
 
-        <button type="button" @click="prevSection" class="btn btn-secondary">Previous</button>
-        <button type="button" @click="nextSection" class="btn btn-primary">Next</button>
-      </div>
-
-      <!-- III. SCHOLARSHIP / MERIT AWARD / PROFESSIONAL LICENSES -->
-      <div v-if="currentSection === 3">
-        <h4>III. Scholarship / Merit Award / Professional Licenses</h4>
-        <div class="form-group">
-          <label>Scholarship/Award/License</label>
-          <input v-model="cv.scholarship" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Institution</label>
-          <input v-model="cv.institution" class="form-control" />
-        </div>
-
-        <button type="button" @click="prevSection" class="btn btn-secondary">Previous</button>
-        <button type="button" @click="nextSection" class="btn btn-primary">Next</button>
-      </div>
+      <!-- III. SCHOLARSHIPS / LICENSES -->
+      <fieldset class="mt-4">
+        <legend>III. SCHOLARSHIPS / LICENSES</legend>
+        <input class="form-control mb-2" v-model="form.scholarships[0]" placeholder="Scholarship/Award/License, Institution" />
+        <input class="form-control" v-model="form.scholarships[1]" placeholder="Scholarship/Award/License, Institution" />
+      </fieldset>
 
       <!-- IV. FAMILY BACKGROUND -->
-      <div v-if="currentSection === 4">
-        <h4>IV. Family Background</h4>
+      <fieldset class="mt-4">
+        <legend>IV. FAMILY BACKGROUND</legend>
         <div class="form-group">
           <label>Spouse (Maiden Name)</label>
-          <input v-model="cv.spouse" class="form-control" />
+          <input class="form-control" v-model="form.spouse" placeholder="Last Name, First Name, Age, Occupation" />
         </div>
         <div class="form-group">
           <label>Mother (Maiden Name)</label>
-          <input v-model="cv.mother" class="form-control" />
+          <input class="form-control" v-model="form.mother" placeholder="Last Name, First Name, Age, Occupation" />
         </div>
         <div class="form-group">
           <label>Father</label>
-          <input v-model="cv.father" class="form-control" />
+          <input class="form-control" v-model="form.father" placeholder="Last Name, First Name, Age, Occupation" />
         </div>
-
-        <button type="button" @click="prevSection" class="btn btn-secondary">Previous</button>
-        <button type="button" @click="nextSection" class="btn btn-primary">Next</button>
-      </div>
+      </fieldset>
 
       <!-- V. EMPLOYMENT HISTORY -->
-      <div v-if="currentSection === 5">
-        <h4>V. Employment History</h4>
-        <div class="form-group">
-          <label>Employer</label>
-          <input v-model="cv.employer" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Position</label>
-          <input v-model="cv.position" class="form-control" />
-        </div>
-
-        <button type="button" @click="prevSection" class="btn btn-secondary">Previous</button>
-        <button type="button" @click="nextSection" class="btn btn-primary">Next</button>
-      </div>
+      <fieldset class="mt-4">
+        <legend>V. EMPLOYMENT HISTORY</legend>
+        <input class="form-control mb-2" v-model="form.employment[0]" placeholder="Employer, Address, Position, Tenure" />
+        <input class="form-control" v-model="form.employment[1]" placeholder="Employer, Address, Position, Tenure" />
+      </fieldset>
 
       <!-- VI. REFERENCES -->
-      <div v-if="currentSection === 6">
-        <h4>VI. References</h4>
-        <div class="form-group">
-          <label>Name</label>
-          <input v-model="cv.referenceName" class="form-control" />
-        </div>
-
-        <button type="button" @click="prevSection" class="btn btn-secondary">Previous</button>
-        <button type="button" @click="nextSection" class="btn btn-primary">Next</button>
-      </div>
+      <fieldset class="mt-4">
+        <legend>VI. REFERENCES</legend>
+        <input class="form-control mb-2" v-model="form.references[0]" placeholder="Name, Occupation, Contact No., Yrs. Known" />
+        <input class="form-control" v-model="form.references[1]" placeholder="Name, Occupation, Contact No., Yrs. Known" />
+      </fieldset>
 
       <!-- VII. DECLARATION -->
-      <div v-if="currentSection === 7">
-        <h4>VII. Declaration</h4>
-        <textarea v-model="cv.declaration" class="form-control" rows="4"></textarea>
+      <fieldset class="mt-4">
+        <legend>VII. DECLARATION</legend>
+        <p>
+          I hereby acknowledge that the above information are true and correct to the best of my knowledge and ability,
+          and any false statements made by me on this application or any supplement record thereto attached shall be
+          sufficient ground/s for disqualification from the company.
+        </p>
+        <div class="form-group">
+          <label>Upload Signature:</label>
+          <input type="file" @change="handleSignatureUpload" class="form-control" />
+        </div>
+      </fieldset>
 
-        <button type="button" @click="prevSection" class="btn btn-secondary">Previous</button>
-        <button type="submit" class="btn btn-primary">Submit CV</button>
-      </div>
+      <button class="btn btn-primary mt-3" type="submit">Submit</button>
     </form>
   </div>
 </template>
@@ -206,75 +114,68 @@
 export default {
   data() {
     return {
-      currentSection: 1,
-      cv: {
-        lastName: '',
-        firstName: '',
-        middleName: '',
+      form: {
+        position: '',
+        date_applied: new Date().toISOString().substr(0, 10),
+        last_name: '',
+        first_name: '',
+        middle_name: '',
         address: '',
-        contact: '',
+        contact_no: '',
         dob: '',
         pob: '',
         email: '',
-        nationalId: '',
-        sssNo: '',
-        tinNo: '',
-        isNewTIN: false,
-        pagibigNo: '',
-        philhealthNo: '',
-        civilStatus: '',
-        signatureUrl: '',
-        college: '',
-        vocational: '',
-        highSchool: '',
-        graduateStudies: '',
-        specialCourse: '',
-        computerLiteracy: '',
-        machinaHandled: '',
-        scholarship: '',
-        institution: '',
+        national_id: '',
+        sss_no: '',
+        tin_no: '',
+        tin_new: false,
+        pagibig: '',
+        philhealth: '',
+        civil_status: '',
+        education: {
+          college: '',
+          vocational: '',
+          highschool: '',
+          graduate: '',
+          skills: '',
+          computer: '',
+          machine: ''
+        },
+        scholarships: ['', ''],
         spouse: '',
         mother: '',
         father: '',
-        employer: '',
-        position: '',
-        referenceName: '',
-        declaration: ''
-      }
-    }
+        employment: ['', ''],
+        references: ['', ''],
+        signature: null
+      },
+      educationLevels: [
+        { label: 'College', key: 'college' },
+        { label: 'Vocational', key: 'vocational' },
+        { label: 'High School', key: 'highschool' },
+        { label: 'Graduate Studies', key: 'graduate' },
+        { label: 'Special Course/Skills', key: 'skills' },
+        { label: 'Computer Literacy', key: 'computer' },
+        { label: 'Machina/Stn Handled', key: 'machine' },
+      ]
+    };
   },
   methods: {
-    nextSection() {
-      if (this.currentSection < 7) {
-        this.currentSection++;
-      }
-    },
-    prevSection() {
-      if (this.currentSection > 1) {
-        this.currentSection--;
-      }
-    },
-    async onFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.cv.signatureUrl = reader.result;
-      };
-      reader.readAsDataURL(file);
-    },
-    async submitCV() {
-      alert('CV Submitted!');
+    submitForm() {
+      // Save to Supabase and navigate to TestPage
       this.$router.push('/test-selection');
+    },
+    handleSignatureUpload(event) {
+      const file = event.target.files[0];
+      this.form.signature = file;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-img {
-  border: 1px solid #ccc;
-  padding: 5px;
-  border-radius: 8px;
+.jobseeker-cv-form {
+  max-width: 800px;
+  margin: 0 auto;
 }
 </style>
