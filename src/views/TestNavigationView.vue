@@ -41,10 +41,9 @@
     },
     methods: {
       startTest(test) {
-        // Pass test ID as query param or route param (future-ready)
-        this.$router.push({ path: '/test', query: { test: test.id } })
+        this.$router.push({ name: 'take-test', params: { testType: test.id } });
       }
-    }
+    },
   }
   </script>
   

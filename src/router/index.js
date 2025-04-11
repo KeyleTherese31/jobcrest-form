@@ -6,6 +6,7 @@ import WelcomeView from '../views/WelcomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import JobseekerCVForm from '../views/JobseekerCVForm.vue'
 import TestNavigationView from '../views/TestNavigationView.vue'
+import TestPage from '@/views/TestPage.vue'
 import AdminView from '../views/AdminView.vue'
 import CreateEditQuestionView from '../views/CreateEditQuestionView.vue'
 import AdminPanel from '../views/AdminPanel.vue'
@@ -22,19 +23,19 @@ export default new Router({
     // Jobseeker Routes
     { path: '/jobseeker/cv', name: 'jobseeker-cv', component: JobseekerCVForm },
     { path: '/test-selection', name: 'test-selection', component: TestNavigationView },
+    { path: '/test/:testType', name: 'take-test', component: TestPage, props: true },
 
     // Admin Routes
     { path: '/admin', name: 'admin', component: AdminView },
-    { path: '/admin/manage-questions', name: 'manage-questions', component: AdminPanel },  // Admin can manage questions
-    { path: '/admin/create-question', name: 'create-question', component: CreateEditQuestionView },  // Admin can create new questions
-    { path: '/admin/edit-questions', name: 'edit-questions', component: AdminPanel },  // Admin can edit/delete questions
-
-    // Edit a specific question for admin
+    { path: '/admin/manage-questions', name: 'manage-questions', component: AdminPanel },
+    { path: '/admin/create-question', name: 'create-question', component: CreateEditQuestionView },
+    { path: '/admin/edit-questions', name: 'edit-questions', component: AdminPanel },
     {
       path: '/admin/edit-question/:testType/:index',
       name: 'edit-question',
       component: CreateEditQuestionView,
-      props: true  // Pass the testType and index to the Edit Question page
+      props: true
     }
   ]
 })
+

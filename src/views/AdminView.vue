@@ -1,44 +1,65 @@
 <template>
-  <div class="container mt-4">
-    <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo" />
-    <h2 class="mb-4">Admin Panel</h2>
+  <div class="container mt-4 admin-panel-wrapper">
+    <!-- Back Button -->
+    <button class="btn btn-back mb-3" @click="$router.back()">← Back</button>
 
-    <div class="action-buttons">
-      <button @click="goToManageQuestions" class="btn btn-primary btn-lg mb-3">
+    <!-- Logo and Heading -->
+    <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo mx-auto d-block mb-3" />
+    <h2 class="text-center text-primary mb-4">Admin Panel</h2>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons mb-4">
+      <button @click="goToManageQuestions" class="btn btn-lg btn-blue-yellow">
         Manage Test Questions
       </button>
-      <button @click="goToViewResults" class="btn btn-success btn-lg mb-3">
+      <button @click="goToViewResults" class="btn btn-lg btn-yellow-blue">
         View Jobseeker Test Results
       </button>
     </div>
 
-    <div v-if="showManageQuestions" class="manage-questions">
-      <h3>Manage Questions</h3>
-      <button @click="goToCreateQuestion" class="btn btn-outline-primary mb-3">Create New Question</button>
-      <button @click="goToEditQuestions" class="btn btn-outline-secondary mb-3">Edit/Delete Questions</button>
+    <!-- Manage Questions Section -->
+    <div v-if="showManageQuestions" class="section-box">
+      <h3 class="text-blue">Manage Questions</h3>
+      <button @click="goToCreateQuestion" class="btn btn-outline-primary mb-3">
+        Create New Question
+      </button>
+      <button @click="goToEditQuestions" class="btn btn-outline-secondary mb-3">
+        Edit/Delete Questions
+      </button>
     </div>
 
-    <div v-if="showViewResults" class="view-results">
-      <h3>Jobseeker Results</h3>
+    <!-- View Results Section -->
+    <div v-if="showViewResults" class="section-box">
+      <h3 class="text-blue">Jobseeker Results</h3>
       <button @click="downloadResults" class="btn btn-outline-success mb-3">
         Download Test Results (CSV)
       </button>
       <div v-if="jobseekerResults.length > 0">
         <ul class="list-group">
-          <li v-for="(result, index) in jobseekerResults" :key="index" class="list-group-item">
+          <li
+            v-for="(result, index) in jobseekerResults"
+            :key="index"
+            class="list-group-item result-item"
+          >
             <strong>Test ID: {{ result.timestamp }}</strong>
-            <ul>
-              <li v-for="(answer, idx) in result.answers" :key="idx">Question {{ idx + 1 }}: {{ answer }}</li>
+            <ul class="mb-0">
+              <li
+                v-for="(answer, idx) in result.answers"
+                :key="idx"
+              >
+                Question {{ idx + 1 }}: {{ answer }}
+              </li>
             </ul>
           </li>
         </ul>
       </div>
       <div v-else>
-        <p>No results submitted yet.</p>
+        <p class="text-muted">No results submitted yet.</p>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -83,22 +104,74 @@ export default {
       link.download = 'jobseeker_results.csv'
       link.click()
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
+.admin-panel-wrapper {
+  background-color: #f2f9ff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 12px rgba(0, 85, 170, 0.08);
+}
+
+.logo {
+  max-width: 220px;
+  border-radius: 10px;
+}
+
+.btn-back {
+  background-color: #ffcc00;
+  color: #003366;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+}
+
+.btn-back:hover {
+  background-color: #ffe066;
+}
+
 .action-buttons {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-.logo {
-  max-width: 240px;
+
+.btn-blue-yellow {
+  background-color: #007bff;
+  color: white;
+  font-weight: 500;
   border-radius: 10px;
+  width: 100%;
 }
-.manage-questions, .view-results {
-  display: flex;
-  flex-direction: column;
+
+.btn-yellow-blue {
+  background-color: #ffcc00;
+  color: #003366;
+  font-weight: 500;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.section-box {
+  background-color: white;
+  border-left: 6px solid #007bff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 8px rgba(0, 85, 170, 0.05);
+  margin-bottom: 20px;
+}
+
+.result-item {
+  border-left: 4px solid #28a745;
+}
+
+.text-blue {
+  color: #0056b3;
 }
 </style>
+

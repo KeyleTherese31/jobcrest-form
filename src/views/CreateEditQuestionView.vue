@@ -1,12 +1,18 @@
 <template>
-  <div class="container mt-4">
-    <h2 v-if="isEditing" class="mb-4">Edit Question</h2>
-    <h2 v-else class="mb-4">Create New Question</h2>
+  <div class="container mt-4 panel-wrapper">
+    <!-- Back Button -->
+    <button class="btn btn-back mb-3" @click="$router.back()">
+      ← Back
+    </button>
+
+    <h2 class="mb-4 text-center text-primary">
+      {{ isEditing ? 'Edit Question' : 'Create New Question' }}
+    </h2>
 
     <form @submit.prevent="isEditing ? saveQuestion() : addToList()">
       <div class="form-group">
         <label>Test Type</label>
-        <select v-model="question.testType" class="form-control" required>
+        <select v-model="question.testType" class="form-control category-select" required>
           <option v-for="test in tests" :key="test.id" :value="test.id">{{ test.name }}</option>
         </select>
       </div>
@@ -31,8 +37,10 @@
           <option value="trueFalse">True/False</option>
           <option value="shortAnswer">Short Answer</option>
           <option value="longAnswer">Long Answer</option>
+          <option value="checkOrX">Check or X</option>
         </select>
       </div>
+
 
       <div v-if="question.format === 'multipleChoice'" class="form-group">
         <label>Choices (separate with commas)</label>
@@ -43,7 +51,7 @@
         <label>Image</label>
         <input type="file" @change="onImageUpload" class="form-control-file" />
         <div v-if="question.image" class="mt-2">
-          <img :src="question.image" class="img-thumbnail" style="max-width: 200px;" />
+          <img :src="question.image" class="img-thumbnail question-image" />
         </div>
       </div>
 
@@ -52,7 +60,12 @@
           {{ isEditing ? 'Save Changes' : 'Add Another Question' }}
         </button>
 
-        <button v-if="questionList.length && !isEditing" type="button" @click="submitAllQuestions" class="btn btn-success">
+        <button
+          v-if="questionList.length && !isEditing"
+          type="button"
+          @click="submitAllQuestions"
+          class="btn btn-success"
+        >
           Submit All ({{ questionList.length }})
         </button>
       </div>
@@ -60,18 +73,18 @@
 
     <!-- Question list preview -->
     <div v-if="questionList.length && !isEditing" class="mt-4">
-      <h5>Questions to be Submitted:</h5>
+      <h5 class="text-blue">Questions to be Submitted:</h5>
       <ul class="list-group">
         <li v-for="(q, i) in questionList" :key="i" class="list-group-item">
-          <strong>{{ q.label }}</strong> <span class="badge badge-info ml-2">{{ q.type }}</span>
+          <strong>{{ q.label }}</strong>
+          <span class="badge badge-info ml-2">{{ q.type }}</span>
         </li>
       </ul>
     </div>
 
-    <div v-if="isEditing" class="mt-4">
-      <button @click="deleteQuestion" class="btn btn-danger">
-        Delete Question
-      </button>
+    <!-- Delete (only for edit mode) -->
+    <div v-if="isEditing" class="mt-4 text-right">
+      <button @click="deleteQuestion" class="btn btn-danger">Delete Question</button>
     </div>
   </div>
 </template>
@@ -228,12 +241,43 @@ export default {
         this.$router.push('/admin')
       }
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
-button {
-  margin-top: 15px;
+.panel-wrapper {
+  background-color: #f9fcff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 73, 128, 0.1);
+}
+
+.text-blue {
+  color: #0056b3;
+}
+
+.btn-back {
+  background-color: #ffcc00;
+  color: #003366;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+}
+
+.btn-back:hover {
+  background-color: #ffdb4d;
+}
+
+.category-select {
+  border: 2px solid #007bff;
+  border-radius: 6px;
+}
+
+.question-image {
+  max-width: 200px;
+  border: 2px solid #007bff;
+  border-radius: 8px;
 }
 </style>
+
