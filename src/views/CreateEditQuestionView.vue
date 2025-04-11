@@ -2,7 +2,7 @@
   <div class="container mt-4 panel-wrapper">
     <!-- Back Button -->
     <button class="btn btn-back mb-3" @click="$router.back()">
-      ← Back
+      <img src="@/assets/back-button.png" alt="back"> Back
     </button>
 
     <h2 class="mb-4 text-center text-primary">

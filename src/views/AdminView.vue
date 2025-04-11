@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4 admin-panel-wrapper">
     <!-- Back Button -->
-    <button class="btn btn-back mb-3" @click="$router.back()">← Back</button>
+    <button class="btn btn-back mb-3" @click="$router.back()"><img src="@/assets/back-button.png" alt="back"> Back</button>
 
     <!-- Logo and Heading -->
     <img src="@/assets/logo.jpg" alt="JobCrest Logo" class="logo mx-auto d-block mb-3" />
@@ -57,6 +57,12 @@
         <p class="text-muted">No results submitted yet.</p>
       </div>
     </div>
+
+    <!-- View CV Profiles -->
+     <div v-if="showCVProfiles" class="section-box">
+
+     </div>
+
   </div>
 </template>
 

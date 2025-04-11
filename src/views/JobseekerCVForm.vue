@@ -2,7 +2,9 @@
   <div :class="['jobseeker-cv-page', theme]">
     <div class="jobseeker-cv-form container py-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <button class="btn btn-secondary" @click="goBack">← Back</button>
+        <button class="btn btn-secondary" @click="goBack">
+          <img src="@/assets/back-button.png" alt="back"> Back
+        </button>
         <button class="btn btn-outline-light" @click="toggleTheme">
           Toggle {{ theme === 'light' ? 'Dark' : 'Light' }} Mode
         </button>
