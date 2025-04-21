@@ -7,6 +7,46 @@
         <p>No questions found for this test.</p>
       </div>
 
+      <!-- For Reading Comprehension -->
+      <div v-if="testName === 'Reading Comprehension'">
+        <div
+          v-for="(group, index) in groupedParagraphs"
+          :key="index"
+          class="mb-5 p-3 border rounded bg-white"
+        >
+          <h5 class="text-primary text-center">
+            Situation {{ index + 1 }}
+          </h5>
+
+          <p v-if="group.paragraph && group.paragraph !== 'No paragraph'" class="mb-3 text-muted">
+            {{ group.paragraph }}
+          </p>
+          <p v-else class="mb-3 text-danger text-center">
+            ⚠️ No paragraph provided for this situation.
+          </p>
+
+          <div
+            v-for="q in group.questions"
+            :key="q.id"
+            class="mb-4 p-3 bg-light rounded"
+          >
+            <p><strong>Question:</strong> {{ q.label }}</p>
+
+            <div v-if="q.format === 'checkOrX'" class="d-flex gap-3">
+              <label class="form-check">
+                <input type="radio" :name="'q-' + q.id" value="Check" v-model="answers[q.id]" />
+                Check
+              </label>
+              <label class="form-check">
+                <input type="radio" :name="'q-' + q.id" value="X" v-model="answers[q.id]" />
+                X
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- For Other Test Types -->
       <div v-else>
         <div
           v-for="(q, i) in questions"
@@ -134,61 +174,93 @@
     </div>
   </div>
 </template>
-  
-  <script>
-  import { createClient } from '@supabase/supabase-js'
-  
-  const supabaseUrl = process.env.VUE_APP_SUPABASE_URL
-  const supabaseKey = process.env.VUE_APP_SUPABASE_KEY
-  const supabase = createClient(supabaseUrl, supabaseKey)
-  
-  export default {
-    data() {
+
+<script>
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.VUE_APP_SUPABASE_URL
+const supabaseKey = process.env.VUE_APP_SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+export default {
+  data() {
     return {
-        testName: '',
-        questions: [],
-        answers: {}, 
-        profileId: null 
+      testName: '',
+      questions: [],
+      answers: {},
+      profileId: null
     }
-    },
-    methods: {
-        async submitAnswers() {
-            if (!this.profileId) {
-                alert('No profile ID found. Cannot submit answers.');
-                return;
-            }
+  },
+  computed: {
+    groupedParagraphs() {
+      if (this.testName !== 'Reading Comprehension') return []
 
-            const answersArray = Object.entries(this.answers).map(([question_id, answer]) => ({
-                profile_id: this.profileId,
-                question_id,
-                answer
-            }));
+      const map = {}
 
-            const { error } = await supabase.from('answers').insert(answersArray);
+      this.questions.forEach(q => {
+        let key = q.paragraph?.trim() || 'No paragraph'
+        if (!map[key]) map[key] = []
+        map[key].push(q)
+      })
 
-            if (error) {
-                console.error('Failed to submit answers:', error);
-            } else {
-                alert('Answers submitted successfully!');
-            }
+      return Object.entries(map).map(([paragraph, questions]) => ({
+        paragraph,
+        questions
+      }))
+    }
+  },
+  methods: {
+    async submitAnswers() {
+      if (!this.profileId) {
+        alert('No profile ID found. Cannot submit answers.')
+        return
+      }
+
+      let correct = 0
+      let total = this.questions.length
+
+      const answersArray = Object.entries(this.answers).map(([question_id, answer]) => {
+        const question = this.questions.find(q => q.id == question_id)
+        const isCorrect = question?.answer_key?.trim().toLowerCase() === answer?.trim().toLowerCase()
+
+        if (isCorrect) correct++
+
+        return {
+          profile_id: this.profileId,
+          question_id: parseInt(question_id),
+          answer,
+          is_correct: isCorrect
         }
-    },
-    async mounted() {
+      })
+
+      const { error } = await supabase.from('answers').insert(answersArray)
+
+      if (error) {
+        console.error('Failed to submit answers:', error)
+      } else {
+        alert(`You scored ${correct} out of ${total}!`)
+      }
+    }
+  },
+  async mounted() {
     const testType = this.$route.params.testType
-    this.profileId = localStorage.getItem('profileId');
+    this.profileId = localStorage.getItem('profileId')
     this.testName = testType
 
     const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('test_type', testType)
+      .from('questions')
+      .select('*')
+      .eq('test_type', testType)
+      .order('id', { ascending: true })
 
     if (error) {
-        console.error('Failed to load questions:', error)
+      console.error('Failed to load questions:', error)
     } else {
-        this.questions = data
-    }
+      this.questions = data
+      if (testType === 'Reading Comprehension') {
+        console.log('Loaded Reading questions:', data)
+      }
     }
   }
-  </script>
-  
+}
+</script>
