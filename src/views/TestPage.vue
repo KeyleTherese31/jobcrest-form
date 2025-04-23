@@ -205,7 +205,7 @@ export default {
 
       return Object.entries(map).map(([paragraph, questions]) => ({
         paragraph,
-        questions
+        questions: questions.sort((a, b) => a.id - b.id) // ⬅️ Ensures consistent order
       }))
     }
   },
