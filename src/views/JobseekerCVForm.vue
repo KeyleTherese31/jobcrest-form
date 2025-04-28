@@ -404,7 +404,7 @@ export default {
 
     // 6. Insert references (to reference_contacts)
     for (const ref of this.form.references) {
-      if (ref.name || ref.occupation) {
+      if (ref.name || ref.occupation || ref.contact || ref.years_known) {
         await supabase.from('reference_contacts').insert([{
           profile_id: profileId,
           name: ref.name,
@@ -415,31 +415,39 @@ export default {
       }
     }
 
-    // 7. Upload signature (optional)
+    // 7. Upload signature (if any)
     if (this.form.signature) {
-      const { data: fileData, error: fileError } = await supabase.storage
-        .from('signatures') // your Supabase bucket name
-        .upload(`signatures/${profileId}_${this.form.signature.name}`, this.form.signature);
+      const file = this.form.signature;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `signatures/${profileId}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('signatures') // Make sure your Supabase storage bucket is called 'signatures'
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type
+        });
 
-      if (!fileError) {
-        const { publicURL } = supabase.storage
-          .from('signatures')
-          .getPublicUrl(fileData.path);
-
-        await supabase.from('signatures').insert([{
-          profile_id: profileId,
-          file_name: this.form.signature.name,
-          file_url: publicURL
-        }]);
+      if (uploadError) {
+        console.error('Signature upload error:', uploadError);
+        return;
       }
+
+      // Optionally update profile with signature path
+      await supabase.from('jobseeker_profiles').update({
+        signature_url: fileName
+      }).eq('id', profileId);
     }
 
-    alert('CV Submitted Successfully!');
-    this.$router.push('/test-selection');
+    alert("CV submitted successfully!");
+    this.$router.push('/thank-you'); // redirect after success (customize this route)
   },
     handleSignatureUpload(event) {
       const file = event.target.files[0];
-      this.form.signature = file;
+      if (file) {
+        this.form.signature = file;
+      }
     }
   }
 };
