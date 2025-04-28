@@ -441,7 +441,7 @@ export default {
     }
 
     alert("CV submitted successfully!");
-    this.$router.push('/thank-you'); // redirect after success (customize this route)
+    this.$router.push('/test-selection'); // redirect after success (customize this route)
   },
     handleSignatureUpload(event) {
       const file = event.target.files[0];

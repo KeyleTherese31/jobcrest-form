@@ -54,13 +54,18 @@
     },
     methods: {
       handleLogin() {
-        if (this.username === 'JCAdmin' && this.password === 'jmimgt#1') {
+        if (this.username === 'SuperAdmin' && this.password === 'superadmin#1') {
+          localStorage.setItem('isSuperAdmin', true);
+          localStorage.setItem('isAdmin', true); // SuperAdmin is still an Admin, just higher
+          this.$router.push('/superadmin'); // Go to SuperAdmin Panel
+        } else if (this.username === 'JCAdmin' && this.password === 'jmimgt#1') {
           localStorage.setItem('isAdmin', true);
-          this.$router.push('/admin');
+          this.$router.push('/admin'); // Go to Admin Panel
         } else {
           this.errorMessage = 'Invalid credentials.';
         }
       },
+
       goBack() {
         this.$router.push('/');
       }
