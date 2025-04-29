@@ -264,3 +264,5 @@ export default {
   }
 }
 </script>
+<!-- submit button doesnt work and the answers doesnt go in answers table in supabase. -->
+<!-- answers table columns: id (uuid), profile_id (uuid), question_id (uuid), answer (text), created_at (timestamp without time zone) -->
