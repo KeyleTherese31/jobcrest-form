@@ -11,12 +11,18 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons mb-4">
-      <button @click="toggleSection('questions')" class="btn btn-lg btn-blue-yellow">
+      <!-- Display Manage Test Questions button only for superadmin -->
+      <button 
+        v-if="userRole === 'superadmin'" 
+        @click="toggleSection('questions')" 
+        class="btn btn-lg btn-blue-yellow">
         Manage Test Questions
       </button>
+      
       <button @click="toggleSection('results')" class="btn btn-lg btn-yellow-blue">
         View Jobseeker Test Results
       </button>
+      
       <button @click="toggleSection('cvs')" class="btn btn-lg btn-blue">
         View Submitted CVs
       </button>
@@ -25,12 +31,15 @@
     <!-- Manage Questions Section -->
     <div v-if="activeSection === 'questions'" class="section-box">
       <h3 class="text-blue">Manage Questions</h3>
-      <button @click="goToCreateQuestion" class="btn btn-outline-primary mb-3">
+      <!-- Allow only superadmin to create or edit questions -->
+      <button v-if="userRole === 'superadmin'" @click="goToCreateQuestion" class="btn btn-outline-primary mb-3">
         Create New Question
       </button>
-      <button @click="goToEditQuestions" class="btn btn-outline-secondary mb-3">
+      <button v-if="userRole === 'superadmin'" @click="goToEditQuestions" class="btn btn-outline-secondary mb-3">
         Edit/Delete Questions
       </button>
+      <!-- Admin can only view questions, not edit -->
+      <p v-if="userRole === 'admin'">You have limited access. You cannot edit or delete questions.</p>
     </div>
 
     <!-- View Results Section -->
@@ -77,6 +86,7 @@
           </div>
 
           <div class="button-group text-end">
+            <!-- Admin can view and download CV -->
             <button class="btn btn-sm btn-outline-primary me-2" @click="viewCV(cv)">
               <i class="fas fa-eye"></i> View
             </button>
@@ -125,6 +135,7 @@ export default {
       jobseekerResults: [],
       cvList: [],
       selectedCV: null,
+      userRole: 'admin',  // Change this to 'superadmin' or 'admin' based on the logged-in user's role
       educationLevels: [
         { label: 'College', key: 'college' },
         { label: 'Vocational', key: 'vocational' },

@@ -25,10 +25,10 @@
 export default {
   methods: {
     goToAdmin() {
-      this.$router.push('/login') // future login page
+      this.$router.push('/login') // future login page for Admin
     },
     goToJobseeker() {
-      this.$router.push('/jobseeker/cv') // cv
+      this.$router.push('/applog') // direct to login page for Jobseeker
     }
   }
 }
