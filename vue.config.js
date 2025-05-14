@@ -5,7 +5,7 @@ module.exports = defineConfig({
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
-  publicPath: '/jobcrest-frontend/',
+  publicPath: '/jobcrest-form/',
   configureWebpack: {
     plugins: [new BundleAnalyzerPlugin()]
   }
