@@ -1,17 +1,10 @@
-const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
-  transpileDependencies: true
-})
+// vue.config.js
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
   publicPath: '/jobcrest-form/',
+  transpileDependencies: true,
   configureWebpack: {
     plugins: [new BundleAnalyzerPlugin()]
   }
 };
-
-// vue.config.js
-export default {
-  publicPath: '/jobcrest-form/'
-}
