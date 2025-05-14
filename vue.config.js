@@ -5,7 +5,13 @@ module.exports = defineConfig({
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
+  publicPath: '/jobcrest-frontend/',
   configureWebpack: {
     plugins: [new BundleAnalyzerPlugin()]
   }
 };
+
+// vue.config.js
+export default {
+  publicPath: '/jobcrest-form/'
+}
