@@ -1,11 +1,10 @@
-const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
-  transpileDependencies: true
-})
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { defineConfig } = require('@vue/cli-service');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer'); // disable for Netlify
 
-module.exports = {
+module.exports = defineConfig({
+  publicPath: '/jobcrest-form/',
+  transpileDependencies: true,
   configureWebpack: {
-    plugins: [new BundleAnalyzerPlugin()]
+    // plugins: [new BundleAnalyzerPlugin()] // disable this
   }
-};
+});
